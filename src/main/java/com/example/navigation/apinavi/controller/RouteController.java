@@ -28,8 +28,11 @@ public class RouteController {
     }
 
     @GetMapping("/route")
-    public ResponseEntity<KakaoRouteAllResponseDto> getRoute(@RequestParam String origin, @RequestParam String destination) {
-        KakaoRouteAllResponseDto response = kakaoRouteSearchService.requestRouteSearch(origin, destination);
+    public ResponseEntity<KakaoRouteAllResponseDto> getRoute(@RequestParam String originAddress, @RequestParam String destinationAddress) {
+        KakaoRouteAllResponseDto response = kakaoRouteSearchService.requestRouteSearch(originAddress, destinationAddress);
+        if (response == null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 적절한 HTTP 상태 코드로 응답
+        }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

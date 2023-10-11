@@ -1,5 +1,7 @@
 package com.example.navigation.apinavi.service;
 
+import com.example.navigation.api.dto.DocumentDto;
+import com.example.navigation.api.service.KakaoAddressSearchService;
 import com.example.navigation.api.service.KakaoUriBuilderService;
 import com.example.navigation.apinavi.dto.KakaoRouteAllResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -22,17 +24,24 @@ public class KakaoRouteSearchService {
 
     private final RestTemplate restTemplate;
     private final KakaoUriBuilderService kakaoUriBuilderService;
+    private final KakaoAddressSearchService kakaoAddressSearchService;
 
     @Value("${kakao.rest.api.key}")
     private String kakaoRestApiKey;
 
 
-    public KakaoRouteAllResponseDto requestRouteSearch(String origin, String destination) {
-        if (ObjectUtils.isEmpty(origin) || ObjectUtils.isEmpty(destination)) return null;
+    public KakaoRouteAllResponseDto requestRouteSearch(String originAddress, String destinationAddress) {
+        if (ObjectUtils.isEmpty(originAddress) || ObjectUtils.isEmpty(destinationAddress)) return null;
 
+        // 출발지와 도착지 주소를 각각 좌표로 변환
+        DocumentDto origin = kakaoAddressSearchService.requestAddressSearch(originAddress).getDocumentDtoList().get(0);
+        DocumentDto destination = kakaoAddressSearchService.requestAddressSearch(destinationAddress).getDocumentDtoList().get(0);
 
+        // "위도,경도" 형식의 문자열 생성
+        String originCoord = origin.getLatitude() + "," + origin.getLongitude();
+        String destinationCoord = destination.getLatitude() + "," + destination.getLongitude();
 
-        URI uri = kakaoUriBuilderService.buildUriByRouteSearch(origin, destination);
+        URI uri = kakaoUriBuilderService.buildUriByRouteSearch(originCoord, destinationCoord);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, "KakaoAK " + kakaoRestApiKey);

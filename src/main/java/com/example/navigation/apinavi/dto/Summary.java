@@ -15,10 +15,10 @@ import java.util.List;
 public class Summary {
 
     @JsonProperty("origin")
-    private Location origin;
+    private Location originAddress;
 
     @JsonProperty("destination")
-    private Location destination;
+    private Location destinationAddress;
 
     @JsonProperty("waypoints")
     private List<Location> waypoints;
