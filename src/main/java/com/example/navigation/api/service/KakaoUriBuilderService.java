@@ -24,4 +24,20 @@ public class KakaoUriBuilderService {
 
         return uri;
     }
+
+    // 길찾기
+    private static final String KAKAO_ROUTE_SEARCH_URL = "https://apis-navi.kakomobility.com/v1/directions";
+
+    public URI buildUriByRouteSearch(String origin, String destination) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(KAKAO_ROUTE_SEARCH_URL);
+
+        uriBuilder.queryParam("origin", origin);
+        uriBuilder.queryParam("destination", destination);
+
+        URI routeUri = uriBuilder.build().encode().toUri();
+
+        log.info("*** 로그 [KakoaUriBuilerSerivce buildUrilByRoutreSerach] origin: {}, destination: {}, uri: {}", origin, destination ,routeUri);
+
+        return routeUri;
+    }
 }
