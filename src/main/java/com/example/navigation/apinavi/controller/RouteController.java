@@ -18,12 +18,12 @@ public class RouteController {
 
     private final KakaoRouteSearchService kakaoRouteSearchService;
 
-    @Value("${kakao.rest.api.key}")
-    private String kakaoRestApiKey;
+    @Value("${kakao.javascript.api.key}")
+    private String kakaoJavascriptApiKey;
 
     @GetMapping("/map")
     public String showMap(Model model) {
-        model.addAttribute("kakaoRestApiKey", kakaoRestApiKey);
+        model.addAttribute("kakaoJavascriptApiKey", kakaoJavascriptApiKey);
         return "index";
     }
 

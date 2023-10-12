@@ -1,6 +1,7 @@
-//-> 여기가 1번재 줄
 
-// 출발지 주소 검색 버튼
+
+
+// 출발지 주소 검색 버튼----------------------------------------------------------------------------------------------------//
 document.getElementById('search-origin').addEventListener('click', function() {
     new daum.Postcode({
         oncomplete: function(data) {
@@ -9,7 +10,7 @@ document.getElementById('search-origin').addEventListener('click', function() {
     }).open();
 });
 
-// 도착지 주소 검색 버튼
+// 도착지 주소 검색 버튼----------------------------------------------------------------------------------------------------//
 document.getElementById('search-destination').addEventListener('click', function() {
     new daum.Postcode({
         oncomplete: function(data) {
@@ -18,20 +19,24 @@ document.getElementById('search-destination').addEventListener('click', function
     }).open();
 });
 
-
-// 사용자가 길 찾기 버튼을 눌렀을 때의 동작
+// 사용자가 길 찾기 버튼을 눌렀을 때의 동작----------------------------------------------------------------------------------------------------//
 document.getElementById('search-form').addEventListener('submit', function(e) {
     e.preventDefault(); // 기본 submit 동작을 막습니다.
 
     var originAddress = document.getElementById('originAddress').value;
     var destinationAddress = document.getElementById('destinationAddress').value;
 
-    // TODO: 여기서 origin과 destination 주소 검증 로직이 필요합니다.
-
     fetch('/route?originAddress=' + originAddress  + '&destinationAddress=' + destinationAddress)
         .then(response => response.json())
         .then(data => {
             // data는 KakaoRouteAllResponseDto 객체
+            clearPolylines(); // 기존의 선들을 모두 제거
+
+            if (!map) {
+                map = new kakao.maps.Map(document.getElementById('map'), {
+                    level: 3
+                });
+            }
 
             // 경로 정보(routes)의 각 섹션(section)별로 반복하여 처리합니다.
             for (let route of data.routes) {
@@ -40,16 +45,63 @@ document.getElementById('search-form').addEventListener('submit', function(e) {
                     // 각 섹션의 경계 상자(bound) 정보를 가져옵니다.
                     let bound = section.bound;
 
-                    // TODO: bound 정보 등을 이용하여 카카오 지도에 섹션을 표시합니다.
+                    // 카카오 지도에 섹션을 표시합니다.
+                    var bounds = new kakao.maps.LatLngBounds(
+                        new kakao.maps.LatLng(bound.min_y, bound.min_x),
+                        new kakao.maps.LatLng(bound.max_y, bound.max_x)
+                    );
+
+                    map.setBounds(bounds);
+
+                    // polyline 생성
+                    for(let road of section.roads){
+                        let path = [];
+                        for(let i=0; i<road.vertexes.length; i+=2){
+                            console.log("vertexes: ", road.vertexes[i], road.vertexes[i+1]);
+                            path.push(new kakao.maps.LatLng(road.vertexes[i+1], road.vertexes[i]));
+                        }
+
+                        let polyline = new kakao.maps.Polyline({
+                            path: path,
+                            strokeWeight: 5,
+                            strokeColor: '#007bff',
+                            strokeOpacity: 0.7,
+                            strokeStyle: 'solid'
+                        });
+
+                        polyline.setMap(map);
+
+                        polylines.push(polyline); // 선을 배열에 추가
+                    }
                 }
             }
         });
 });
 
-// 카카오 지도 초기화
-// var mapContainer = document.getElementById('map'),
-//     mapOption = {
-//         center: new kakao.maps.LatLng(37.566826, 126.9786567), // 초기 지도 중심 좌표
-//         level: 3 // 지도 확대 레벨
-//     };
-// var map = new kakao.maps.Map(mapContainer, mapOption); // 여기가 55번째줄
+// kakaomap 표시 해주는 곳-----------------------------------------------------------------------------------------------------//
+var container = document.getElementById('map');
+var options = {
+    center: new kakao.maps.LatLng(33.450701, 126.570667),
+    level: 3
+};
+
+var map = new kakao.maps.Map(container, options);
+
+// 상세교통상황 표시------------------------------------------------------------------------------------------------------------//
+// map.addOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC);
+
+// 경로 안내 polyline ----------------------------------------------------------------------------------------------------------//
+var polylines = [];
+function clearPolylines() {
+    for (let i = 0; i < polylines.length; i++) {
+        polylines[i].setMap(null);
+    }
+    polylines = [];
+}
+
+
+
+
+
+
+
