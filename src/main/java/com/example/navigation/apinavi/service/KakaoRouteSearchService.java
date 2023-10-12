@@ -38,8 +38,8 @@ public class KakaoRouteSearchService {
         DocumentDto destination = kakaoAddressSearchService.requestAddressSearch(destinationAddress).getDocumentDtoList().get(0);
 
         // "위도,경도" 형식의 문자열 생성
-        String originCoord = origin.getLatitude() + "," + origin.getLongitude();
-        String destinationCoord = destination.getLatitude() + "," + destination.getLongitude();
+        String originCoord = origin.getLongitude() + "," + origin.getLatitude();
+        String destinationCoord = destination.getLongitude() + "," + destination.getLatitude();
 
         URI uri = kakaoUriBuilderService.buildUriByRouteSearch(originCoord, destinationCoord);
 

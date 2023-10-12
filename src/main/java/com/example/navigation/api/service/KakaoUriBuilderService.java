@@ -26,7 +26,8 @@ public class KakaoUriBuilderService {
     }
 
     // 길찾기
-    private static final String KAKAO_ROUTE_SEARCH_URL = "https://apis-navi.kakomobility.com/v1/directions";
+    private static final String KAKAO_ROUTE_SEARCH_URL = "https://apis-navi.kakaomobility.com/v1/directions";
+
 
     public URI buildUriByRouteSearch(String origin, String destination) {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(KAKAO_ROUTE_SEARCH_URL);
